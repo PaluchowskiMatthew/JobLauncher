@@ -29,9 +29,9 @@ The resource allocator manages sessions and jobs on the cluster
 """
 
 
-from viztools.utils import http_request, HTTP_METHOD_GET, HTTP_METHOD_PUT, \
+from joblauncher.utils import http_request, HTTP_METHOD_GET, HTTP_METHOD_PUT, \
     HTTP_METHOD_DELETE, HTTP_METHOD_POST, HTTP_STATUS_OK, Status
-import viztools.settings as settings
+import joblauncher.settings as settings
 import time
 
 SESSION_STATUS_STOPPED = 0
@@ -95,7 +95,7 @@ class ResourceAllocator(object):
 
             payload = {
                 "renderer_id": self._renderer,
-                "owner": "viztools"
+                "owner": "joblauncher"
             }
             status = self.session_create(payload)
             if status.code != 201:
