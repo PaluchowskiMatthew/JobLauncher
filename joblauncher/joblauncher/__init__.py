@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # pylint: disable=R0801,E1101
+import logging
 
-from .resource_allocator import ResourceAllocator
+from .job_launcher import JobLauncher
 from .utils import inherit_docstring_from
-# from .settings import *
 
-def initResource():
-    return ResourceAllocator()
+logger = logging.getLogger(__name__)
+
+logger.addHandler(logging.NullHandler())
+
+def init():
+    return JobLauncher()

@@ -19,5 +19,6 @@ setup(name='joblauncher',
       license='GNU LGPL',
       packages=['joblauncher'],
       install_requires=requirements,
-      test_suite='tests'
+      test_suite='nose.collector',
+      tests_require=['nose'],
       )

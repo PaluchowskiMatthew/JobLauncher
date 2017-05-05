@@ -29,6 +29,7 @@ The visualizer is the remote rendering resource in charge of rendering datasets
 """
 
 import requests
+import pprint
 import sys
 from collections import OrderedDict
 
@@ -48,6 +49,11 @@ class Status(object):
         self.code = code
         self.contents = contents
         self.cookies = cookies
+
+    def show(self):
+        pprint.pprint('HTTP status code: ' + str(self.code))
+        pprint.pprint('Contents: ' + str(self.contents))
+        pprint.pprint('Cookies:' + str(self.cookies))
 
 
 def http_request(method, url, body=None, command=None, cookies=None):
