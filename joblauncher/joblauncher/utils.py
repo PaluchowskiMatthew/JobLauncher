@@ -50,7 +50,7 @@ class Status(object):
         self.contents = contents
         self.cookies = cookies
 
-    def show(self):
+    def show_response(self):
         pprint.pprint('HTTP status code: ' + str(self.code))
         pprint.pprint('Contents: ' + str(self.contents))
         pprint.pprint('Cookies:' + str(self.cookies))

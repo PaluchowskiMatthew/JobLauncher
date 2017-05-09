@@ -142,7 +142,10 @@ class ResourceAllocator(object):
         Create a session
         """
         self._cookies = None
-        return http_request(HTTP_METHOD_POST, self._url_session, payload, None, self._cookies)
+        status = http_request(HTTP_METHOD_POST, self._url_session, payload, None, self._cookies)
+        if status.code == 201:
+            self._cookies = status.cookies
+        return status
 
     def session_list(self):
         """
@@ -244,3 +247,13 @@ class ResourceAllocator(object):
                 self.session_delete()
                 raise Exception(status.contents)
         return status
+
+    def _obtain_registry(self):
+        """ Returns the registry of PUT and GET objects of the application """
+        status = self.session_command('GET', 'registry')
+        return status.contents, status.code
+
+    def _schema(self, object_name):
+        """ Returns the JSON schema for the given object """
+        status = self.session_command('GET', object_name + '/schema')
+        return status.contents, status.code
