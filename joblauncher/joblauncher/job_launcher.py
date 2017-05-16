@@ -1,7 +1,8 @@
 import pprint
 import logging
-import sys
-from time import sleep
+from tqdm import tqdm
+import time
+import requests
 import json
 
 
@@ -21,6 +22,8 @@ class JobLauncher(ResourceAllocator):
             super(JobLauncher, self).__init__(resource_url = resource)
         else:
             super(JobLauncher, self).__init__()
+
+        self.launched_job_url = None
 
 
     def get_allocation_settings(self):
@@ -79,13 +82,13 @@ class JobLauncher(ResourceAllocator):
         """
         default_renderer_payload = {
             "id": "bbic_wrapper",
-            "command_line": "pip install flask --user; python /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/wrapper/wrapper.py",
+            "command_line": "pip install flask --user; python -u /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/wrapper/wrapper.py",
             "environment_variables": "",
             "modules": "BBP/viz/latest BBP/viz/hdf5/1.8.15 BBP/viz/python/3.4.3",
             "process_rest_parameters_format": "",
-            "scheduler_rest_parameters_format": '--script-command "bbic_stack.py /gpfs/bbp.cscs.ch/project/proj39/rrm_test/out_vm.h5 --create-from /gpfs/bbp.cscs.ch/home/tresch/bigbrain600/list.txt --orientation coronal --all-stacks" --host "${rest_hostname}" --port "${rest_port}"',
+            "scheduler_rest_parameters_format": '--script-command "python3 -u /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/wrapper/bbic_stack.py /gpfs/bbp.cscs.ch/project/proj39/rrm_test/out_vm.h5 --create-from /gpfs/bbp.cscs.ch/home/tresch/bigbrain600/list.txt --orientation coronal --all-stacks" --host "${rest_hostname}" --port "${rest_port}"',
             "project": "proj39",
-            "queue": "test",
+            "queue": "prod",
             "exclusive": False,
             "nb_nodes": 1,
             "nb_cpus": 1,
@@ -132,7 +135,7 @@ class JobLauncher(ResourceAllocator):
             for key, value in kwargs.iteritems():
                 if key in renderer:
                     renderer[key] = value
-
+            renderer["id"] = renderer_id
             return self.config_update(renderer)
         else:
             return Status(400, 'Renderer not found.', '')
@@ -161,8 +164,14 @@ class JobLauncher(ResourceAllocator):
         # This calls session_schedule() with payload containing allocation settings and schedules a job run given the renderer_id
         resource = self.resource_url()
         if resource is not None:
+            self.launched_job_url = resource
             print('Job scheduled and launched!')
             logger.info('Job scheduled and launched!')
+        else:
+            print('Failed to schedule and launch the job!')
+            logger.info('Failed to schedule and launch the job!')
+
+
 
 
     def get_job_status(self):
@@ -170,11 +179,16 @@ class JobLauncher(ResourceAllocator):
 
         :return:
         """
+        max_ = 100
+        with tqdm(total=max_) as pbar:
+            while True:
+                response = requests.get(self.launched_job_url + '/resourceconnector/v1/status')
+                data = response.json()
+                progress = int(data['progress'])
+                pbar.update(progress - pbar.n)
 
-        # This is just a plain progressbar
-        for i in range(21):
-            sys.stdout.write('\r')
-            # the exact output you're looking for:
-            sys.stdout.write("[%-20s] %d%%" % ('=' * i, 5 * i))
-            sys.stdout.flush()
-            sleep(0.25)
+                if progress >= 100:
+                    print('Job completed!')
+                    logger.info('Job scheduled and launched!')
+                    break
+                time.sleep(.5)

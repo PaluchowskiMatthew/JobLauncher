@@ -87,7 +87,7 @@ class ResourceAllocator(object):
         if self._cookies is not None:
             self.session_delete()
 
-    def resource_url(self):
+    def  resource_url(self):
         """ Return the URL of the resources' http server """
         try:
             if self._resource_url is not None:
@@ -126,12 +126,13 @@ class ResourceAllocator(object):
                     time.sleep(1)
                 else:
                     running = True
+                    self._resource_url = 'http://' + status.contents['hostname'] + ':' + status.contents['port']
                 attempt = attempt + 1
 
             if not running:
                 raise Exception('Failed to get rendering resource running')
 
-            return self._url_session
+            return self._resource_url
         except Exception:
             status = self.session_delete()
             raise

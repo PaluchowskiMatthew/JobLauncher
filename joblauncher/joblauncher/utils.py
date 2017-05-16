@@ -75,12 +75,12 @@ def http_request(method, url, body=None, command=None, cookies=None):
             if body == '':
                 request = requests.post(full_url, cookies=cookies)
             else:
-                request = requests.post(full_url, data=body, cookies=cookies)
+                request = requests.post(full_url, json=body, cookies=cookies)
         elif method == HTTP_METHOD_PUT:
             if body == '':
                 request = requests.put(full_url, cookies=cookies)
             else:
-                request = requests.put(full_url, data=body, cookies=cookies)
+                request = requests.put(full_url, json=body, cookies=cookies)
         elif method == HTTP_METHOD_GET:
             request = requests.get(full_url, cookies=cookies)
             if request.status_code == 502:
@@ -89,7 +89,7 @@ def http_request(method, url, body=None, command=None, cookies=None):
             if body == '':
                 request = requests.delete(full_url, cookies=cookies)
             else:
-                request = requests.delete(full_url, data=body, cookies=cookies)
+                request = requests.delete(full_url, json=body, cookies=cookies)
         js = ''
         if request.content:
             if request.status_code == 200:
