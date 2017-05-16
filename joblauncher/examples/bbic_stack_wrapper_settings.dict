@@ -1,0 +1,19 @@
+# This is a working job settings payload for launching bbic_stack.py script
+{
+ 'command_line': 'pip3 install flask --user; python3 /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/Wrapper/wrapper.py',
+ 'description': 'wrapper for bbic',
+ 'environment_variables': u'',
+ 'exclusive': false,
+ 'graceful_exit': false,
+ 'id': 'bbic_wrapper',
+ 'modules': u'BBP/viz/latest BBP/viz/hdf5/1.8.15 BBP/viz/python/3.4.3',
+ 'name': 'bbic',
+ 'nb_cpus': 1,
+ 'nb_gpus': 0,
+ 'nb_nodes': 1,
+ 'process_rest_parameters_format': '',
+ 'project': 'proj39',
+ 'queue': 'interactive',
+ 'scheduler_rest_parameters_format': '--script-command "python3 -u /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/Wrapper/services/bbic_stack/bbic_stack.py /gpfs/bbp.cscs.ch/home/bbpnisoa/rrm_test/out_vm.h5 --create-from /gpfs/bbp.cscs.ch/home/tresch/bigbrain600/list.txt --orientation coronal --all-stacks" --host "${rest_hostname}" --port "${rest_port}"',
+ 'wait_until_running': false
+}
