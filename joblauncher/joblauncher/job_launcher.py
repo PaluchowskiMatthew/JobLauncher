@@ -162,7 +162,7 @@ class JobLauncher(ResourceAllocator):
 
     def delete_job_settings(self, renderer_id):
         """
-        Deletes job settigns from RenderingResourceManager
+        Deletes job settings from RenderingResourceManager
         :param renderer_id: Job identifier
         :return: Status object holding execution status of an HTTP request
         """

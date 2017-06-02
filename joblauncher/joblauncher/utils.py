@@ -31,6 +31,7 @@ The visualizer is the remote rendering resource in charge of rendering datasets
 import requests
 import pprint
 import sys
+import json
 from collections import OrderedDict
 
 
@@ -89,7 +90,7 @@ def http_request(method, url, body=None, command=None, cookies=None):
             if body == '':
                 request = requests.delete(full_url, cookies=cookies)
             else:
-                request = requests.delete(full_url, json=body, cookies=cookies)
+                request = requests.delete(full_url, json=json.dumps(body), cookies=cookies)
         js = ''
         if request.content:
             if request.status_code == 200:
