@@ -1,9 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+###############################################################################
+#
+# Code related to EPFL Master Semester Project:
+# "A job management web service for cluster-based processing in Brain Atlasing"
+#
+# Version 1.0, 02 June 2017
+#
+# Copyright (c) 2017, Blue Brain Project
+#                     Mateusz Paluchowski <mateusz.paluchowski@epfl.ch>
+#                     Christian Tresch <christian.tresch@epfl.ch>
+#
+# This file is part of ClusterTools, fork of VizTools
+# <https://github.com/BlueBrain/VizTools>
+#
+###############################################################################
+
 import pprint
 import logging
 from tqdm import tqdm
 import time
 import requests
-import json
 
 
 from .resource_allocator import ResourceAllocator
@@ -15,7 +33,6 @@ class JobLauncher(ResourceAllocator):
     """
     Simple wrapper around ResourceAllocator for extending and simplifying process of connecting to Rendering Resource Manager
     """
-
     def __init__(self, resource=None):
 
         if isinstance(resource, basestring):
@@ -28,7 +45,7 @@ class JobLauncher(ResourceAllocator):
 
     def get_allocation_settings(self):
         """
-        Prints settings of ResourceAllocator
+        :return: dict representation of ResourceAllocator settings
         """
         attributes = vars(self)
         return attributes
@@ -36,6 +53,7 @@ class JobLauncher(ResourceAllocator):
     def edit_allocation_settings(self, **kwargs):
         """
         Updates settings of ResourceAllocator
+        :return: dict representation of updated allocation settings
         """
         for key, value in kwargs.iteritems():
             if hasattr(self, key):
@@ -48,7 +66,7 @@ class JobLauncher(ResourceAllocator):
     def create_job_renderer(self, payload=None):
         """
         Creates new renderer basing either on payload provided or default renderer if one is not provided
-        :return:
+        :return: dict representation of renderer settings payload
         """
         if not payload:
             payload = self.create_renderer_payload()
@@ -78,11 +96,11 @@ class JobLauncher(ResourceAllocator):
         and modifies values if proper kwargs were provided
         :param kwargs: id, command_line, environment_variables, modules, process_rest_parameters_format,
         scheduler_rest_parameters_format, project, queue, exclusive, nb_nodes, nb_cpus, nb_gpus, graceful_exit, wait_until_running
-        :return: payload as json
+        :return: dict representation of renderer settings payload
         """
         default_renderer_payload = {
             "id": "bbic_wrapper",
-            "command_line": "pip install flask --user; python -u /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/wrapper/wrapper.py",
+            "command_line": "pip3 install flask --user; python3 /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/Wrapper/wrapper.py",
             "environment_variables": "",
             "modules": "BBP/viz/latest BBP/viz/hdf5/1.8.15 BBP/viz/python/3.4.3",
             "process_rest_parameters_format": "",
@@ -105,9 +123,9 @@ class JobLauncher(ResourceAllocator):
 
     def get_job_settings(self, renderer_id):
         """
-        Prints the settings of selected job identified by renderer_id
+        Returns the settings of selected job identified by renderer_id
         :param renderer_id: Job identifier
-        :return:
+        :return: None or dict representation of selected job settings
         """
         renderers = self.config_list().contents
         if renderers:
@@ -122,9 +140,10 @@ class JobLauncher(ResourceAllocator):
 
     def edit_job_settings(self, renderer_id, **kwargs):
         """
-        :param renderer_id:
-        :param kwargs:
-        :return:
+        Updates the settings of selected job identified by renderer_id.
+        :param renderer_id: Job identifier
+        :param kwargs: key-value pairs with new settings of job identified
+        :return: Status object holding execution status of an HTTP request
         """
         renderers = self.config_list().contents
         if renderers:
@@ -143,19 +162,18 @@ class JobLauncher(ResourceAllocator):
 
     def delete_job_settings(self, renderer_id):
         """
-
-        TODO: FIX. NOT WORKING.
-
-        :param renderer_id:
-        :return:
+        Deletes job settigns from RenderingResourceManager
+        :param renderer_id: Job identifier
+        :return: Status object holding execution status of an HTTP request
         """
         return self.config_delete({"id": renderer_id})
 
 
     def schedule_and_launch_job(self, renderer_id=None):
         """
-        :param renderer_id:
-        :return:
+        Method used for scheduling required resources and launching specific job
+        :param renderer_id: Job identifier
+        :return: Boolean indicating if job schedule and launch was successful
         """
 
         if renderer_id is not None:
@@ -167,17 +185,16 @@ class JobLauncher(ResourceAllocator):
             self.launched_job_url = resource
             print('Job scheduled and launched!')
             logger.info('Job scheduled and launched!')
+            return True
         else:
             print('Failed to schedule and launch the job!')
             logger.info('Failed to schedule and launch the job!')
-
-
+            return False
 
 
     def get_job_status(self):
         """
-
-        :return:
+        Progress bar indicating the status of scheduled and launched job
         """
         max_ = 100
         with tqdm(total=max_) as pbar:
