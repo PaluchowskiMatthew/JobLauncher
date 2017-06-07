@@ -191,18 +191,48 @@ class JobLauncher(ResourceAllocator):
             logger.info('Failed to schedule and launch the job!')
             return False
 
+    def deallocate_and_cancel_job(self):
+        """
+        Delete session which results in job cancel and deallocation of the resources on the cluster via Rendering Resource Manager.
+        :return: Status object holding execution status of an HTTP request
+        """
+        # TODO verify that is enough to deallocate resources and then get the new job running.
+        self.launched_job_url = None
+        self._resource_url = None
+        return self.session_delete()
 
-    def get_job_status(self):
+    def get_single_job_status(self):
+        """
+        Single API call to check what is the status of scheduled and launched job
+        :return: Progress in percents
+        """
+        if not self.launched_job_url:
+            print('Job was not scheduled and launched')
+            return -1
+        try:
+            response = requests.get(self.launched_job_url + '/resourceconnector/v1/status')
+            data = response.json()
+            progress = int(data['progress'])
+            return progress
+        except Exception:
+            print('Exception caught')
+            raise
+
+    def get_continuous_job_status(self):
         """
         Progress bar indicating the status of scheduled and launched job
         """
         max_ = 100
         with tqdm(total=max_) as pbar:
             while True:
-                response = requests.get(self.launched_job_url + '/resourceconnector/v1/status')
-                data = response.json()
-                progress = int(data['progress'])
-                pbar.update(progress - pbar.n)
+                try:
+                    response = requests.get(self.launched_job_url + '/resourceconnector/v1/status')
+                    data = response.json()
+                    progress = int(data['progress'])
+                    pbar.update(progress - pbar.n)
+                except Exception:
+                    print('Exception caught')
+                    raise
 
                 if progress >= 100:
                     print('Job completed!')
