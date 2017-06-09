@@ -173,7 +173,7 @@ class JobLauncher(ResourceAllocator):
         """
         Method used for scheduling required resources and launching specific job
         :param renderer_id: Job identifier
-        :return: Boolean indicating if job schedule and launch was successful
+        :return: Status object holding execution status of an HTTP request
         """
 
         if renderer_id is not None:
@@ -185,11 +185,11 @@ class JobLauncher(ResourceAllocator):
             self.launched_job_url = resource
             print('Job scheduled and launched!')
             logger.info('Job scheduled and launched!')
-            return True
+            return Status(200, 'Job scheduled and launched!', '')
         else:
             print('Failed to schedule and launch the job!')
             logger.info('Failed to schedule and launch the job!')
-            return False
+            return Status(400, 'Failed to schedule and launch the job!', '')
 
     def deallocate_and_cancel_job(self):
         """
@@ -199,7 +199,14 @@ class JobLauncher(ResourceAllocator):
         # TODO verify that is enough to deallocate resources and then get the new job running.
         self.launched_job_url = None
         self._resource_url = None
-        return self.session_delete()
+        response = self.session_delete()
+        if response.code == 200:
+            print('Resources deallocated and job canceled successfully!')
+            logger.info('Resources deallocated and job canceled successfully!')
+        else:
+            print('Failed to deallocate resources and cancel the job.')
+            logger.info('Failed to deallocate resources and cancel the job.')
+        return response
 
     def get_single_job_status(self):
         """
@@ -207,7 +214,8 @@ class JobLauncher(ResourceAllocator):
         :return: Progress in percents
         """
         if not self.launched_job_url:
-            print('Job was not scheduled and launched')
+            print('Job was not scheduled and launched!')
+            logger.info('Job was not scheduled and launched!')
             return -1
         try:
             response = requests.get(self.launched_job_url + '/resourceconnector/v1/status')
@@ -215,7 +223,7 @@ class JobLauncher(ResourceAllocator):
             progress = int(data['progress'])
             return progress
         except Exception:
-            print('Exception caught')
+            print('Exception caught.')
             raise
 
     def get_continuous_job_status(self):
@@ -231,7 +239,7 @@ class JobLauncher(ResourceAllocator):
                     progress = int(data['progress'])
                     pbar.update(progress - pbar.n)
                 except Exception:
-                    print('Exception caught')
+                    print('Exception caught.')
                     raise
 
                 if progress >= 100:
