@@ -14,7 +14,7 @@ with open(REQS_PATH) as f:
 
 setup(name='joblauncher',
       version='0.1',
-      description='Simple python package for interaction with RenderingResourceManager',
+      description='Simple python package for interaction with JobManager',
       author='Mateusz Paluchowski & Christian Tresch',
       license='GNU LGPL',
       packages=['joblauncher'],

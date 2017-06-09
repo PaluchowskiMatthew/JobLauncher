@@ -1,6 +1,6 @@
 # JobLauncher
 
-Simple python package for interaction with RenderingResourceManager.
+Simple python package for interaction with JobManager.
 
 Code related to EPFL Master Semester Project:
 

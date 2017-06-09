@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 class JobLauncher(ResourceAllocator):
     """
-    Simple wrapper around ResourceAllocator for extending and simplifying process of connecting to Rendering Resource Manager
+    Simple wrapper around ResourceAllocator for extending and simplifying process of connecting to JobManager
     """
     def __init__(self, resource=None):
 
@@ -193,7 +193,7 @@ class JobLauncher(ResourceAllocator):
 
     def deallocate_and_cancel_job(self):
         """
-        Delete session which results in job cancel and deallocation of the resources on the cluster via Rendering Resource Manager.
+        Delete session which results in job cancel and deallocation of the resources on the cluster via JobManager.
         :return: Status object holding execution status of an HTTP request
         """
         # TODO verify that is enough to deallocate resources and then get the new job running.
@@ -220,7 +220,7 @@ class JobLauncher(ResourceAllocator):
 
     def get_continuous_job_status(self):
         """
-        Progress bar indicating the status of scheduled and launched job
+        Prints progress bar indicating the status of scheduled and launched job
         """
         max_ = 100
         with tqdm(total=max_) as pbar:
